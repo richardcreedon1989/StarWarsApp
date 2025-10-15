@@ -6,16 +6,17 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: true, // listen on all interfaces
-    port: 5173,
+    port: 5174,
     allowedHosts: [
-      "8nvfnw-5173.csb.app", // <-- your sandbox host (from the error)
-      "csb.app",
-      "codesandbox.io",
+      // "localhost",
+      // "8nvfnw-5173.csb.app",
+      // "csb.app",
+      // "codesandbox.io",
     ],
     hmr: {
-      protocol: "wss",
-      clientPort: 443,
-      host: "8nvfnw-5173.csb.app",
+      // protocol: "wss", //calls localhost constantly otgherwise
+      // clientPort: 443,
+      // host: "8nvfnw-5173.csb.app",
     },
   },
 });

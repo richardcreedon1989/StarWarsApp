@@ -35,8 +35,8 @@ export default function App() {
         <NavigationTabs />
         <EntityDialogHost />
       </EntityDialogProvider>
-      {/* <BasicTabs onOpenResident={openResident} />
-      <DescriptionDialog
+      {/* <BasicTabs onOpenResident={openResident} /> */}
+      {/* <DescriptionDialog
         openResident={openResident}
         open={open}
         residentUrl={residentUrl}
@@ -44,9 +44,9 @@ export default function App() {
         onClose={() => setOpen(false)}
         // filmNames={joinedTitles}
       /> */}
-      {/* <PlanetCardContainer /> */}
-      {/* <CardContainer /> */}
-      {/* <PlanetCardContainer planet={data?.results ?? []} /> */}
+      {/* <PlanetCardContainer />
+      <CardContainer />
+      <PlanetCardContainer planet={data?.results ?? []} /> */}
     </div>
   );
 }
