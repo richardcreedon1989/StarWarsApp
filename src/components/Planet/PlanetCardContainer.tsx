@@ -6,7 +6,7 @@ import { usePlanets } from "../../hooks/usePlanets";
 // import { useFilms } from "./hooks/useFilms";
 // import { useResidents } from "./hooks/useResidents";
 
-export default function PlanetCardContainer({ onOpenResident }) {
+export default function PlanetCardContainer() {
   const starWarsData = usePlanets();
   const { data, isLoading, isError } = starWarsData;
 

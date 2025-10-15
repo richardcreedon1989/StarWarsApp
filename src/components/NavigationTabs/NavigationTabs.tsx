@@ -5,7 +5,7 @@ import Box from "@mui/material/Box";
 import PlanetCardContainer from "../Planet/PlanetCardContainer";
 import CharacterCardContainer from "../Character/CharactersCardContainer";
 import StarshipsContainer from "../Starships/StarshipsContainer";
-import Table from "../Table";
+// import Table from "../Table";
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;
@@ -35,7 +35,7 @@ function a11yProps(index: number) {
   };
 }
 
-export default function NavigationTabs({ onOpenResident }) {
+export default function NavigationTabs() {
   const [value, setValue] = React.useState(0);
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -55,7 +55,7 @@ export default function NavigationTabs({ onOpenResident }) {
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>
-        <PlanetCardContainer onOpenResident={onOpenResident} />
+        <PlanetCardContainer />
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
         <CharacterCardContainer />
