@@ -1,29 +1,42 @@
-// features/planets/PlanetCardContainer.tsx
-// import CardComponent from "./CardComponent";
-import { usePlanets } from "../../hooks/usePlanets";
+// features/starships/StarshipsContainer.tsx
+import * as React from "react";
 import { useAllStarships } from "../../hooks/useStarships";
 import StarshipsComponent from "./StarshipsComponent";
-// import { useFilms } from "./hooks/useFilms";
-// import { useResidents } from "./hooks/useResidents";
 
-export default function StarshipsContainer() {
-  const starships = useAllStarships();
-  const { data, isLoading, isError } = starships;
+type Props = {
+  page: number;
+  setCount: (itemsCount: number) => void; // <-- raw items count (not pages)
+  search?: string; // optional, if your hook supports it
+};
 
-  if (isLoading) {
-    console.log("⏳ Loading planets...");
-    return <div>Loading planets...</div>;
-  }
+export default function StarshipsContainer({
+  page,
+  setCount,
+  search = "",
+}: Props) {
+  // If your hook supports search: useAllStarships(page, search)
+  const { data, isLoading, isError } = useAllStarships(page, search);
 
-  if (isError) {
-    console.error("❌ Error loading planets");
-    return <div>Error fetching planets</div>;
-  }
-  // console.log("starships123", starships);
-  const starshipsData = data.results;
+  // send RAW items count up (Pages does Math.ceil(count / 10))
+  React.useEffect(() => {
+    if (typeof data?.count === "number") {
+      setCount(data.count);
+    }
+  }, [data?.count, setCount]);
 
-  const mapStarships = starshipsData?.map((item) => {
-    return <StarshipsComponent props={item} />;
-  });
-  return mapStarships;
+  if (isLoading) return <div>Loading starships…</div>;
+  if (isError) return <div>Error fetching starships</div>;
+
+  const starships = data?.results ?? [];
+
+  return (
+    <>
+      {starships.map((item: any) => (
+        <StarshipsComponent
+          key={item.url ?? `${item.name}-${item.model}`}
+          props={item}
+        />
+      ))}
+    </>
+  );
 }

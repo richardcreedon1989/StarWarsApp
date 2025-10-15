@@ -4,7 +4,6 @@ import { useFilms, useFilmsMany } from "../../hooks/useFilms";
 const StarshipsComponent = ({ props }) => {
   //   const [expanded, setExpanded] = React.useState(true); //when user clicks expand
   const { films, name } = props;
-  console.log("props4441", name);
   const allFilms = useFilmsMany(films ?? []);
   console.log("allFilms", allFilms);
 

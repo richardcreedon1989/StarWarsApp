@@ -13,7 +13,6 @@ export default function CharacterCardComponent({ props }) {
 
   const { films, starships, homeworld, name } = props;
   const getPlanet = usePlanets(homeworld);
-  console.log("getPlanetHere", getPlanet);
   const url = getPlanet?.data?.url;
   // console.log("getPlanet", getPlanet);
   const homePlanet = getPlanet?.data?.name;
@@ -86,8 +85,6 @@ export default function CharacterCardComponent({ props }) {
       </button>
     );
   };
-
-  console.log("ateadssa", getPlanet);
 
   const shipPlanetButtons = (planetQ) => {
     const url = planetQ?.data?.url;

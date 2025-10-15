@@ -112,14 +112,14 @@ const rows = [
   createData("Cupcake", 305, 3.7, 67, 4.3, 2.5),
   createData("Gingerbread", 356, 16.0, 49, 3.9, 1.5),
 ];
-export default function CollapsibleTable() {
+export default function CollapsibleTable(props) {
   return (
     <TableContainer component={Paper}>
       <Table aria-label="collapsible table">
         <TableHead>
           <TableRow>
             <TableCell />
-            <TableCell>Dessert (100g serving)</TableCell>
+            <TableCell>Name (100g serving)</TableCell>
             <TableCell align="right">Calories</TableCell>
             <TableCell align="right">Fat&nbsp;(g)</TableCell>
             <TableCell align="right">Carbs&nbsp;(g)</TableCell>

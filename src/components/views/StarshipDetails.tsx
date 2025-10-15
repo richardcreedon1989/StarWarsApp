@@ -13,7 +13,6 @@ export default function StarshipDetails({ url }: { url: string }) {
   const starship = useStarship(url);
   const model = starship?.data?.model;
   const crew = starship?.data?.crew;
-  console.log("starship123", starship);
   const film123 = getPlanetFilms
     .map((q) => q.data?.title)
     .filter(Boolean)

@@ -1,30 +1,37 @@
-// features/planets/PlanetCardContainer.tsx
-// import CardComponent from "./CardComponent";
+// features/character/CharacterCardContainer.tsx
+import * as React from "react";
 import CharacterCardComponent from "./CharacterCardComponent";
-import { useAllResidents } from "../../hooks/useResidentsTest"; // the JS version we wrote
+import { useAllResidents } from "../../hooks/useResidentsTest";
 
-// import { useFilms } from "./hooks/useFilms";
-// import { useResidents } from "./hooks/useResidents";
+type Props = {
+  page: number;
+  setCount: (pages: number) => void; // expects number of pages
+  search?: string; // optional search term
+};
 
-export default function CharacterCardContainer() {
-  const starWarsData = useAllResidents();
+export default function CharacterCardContainer({
+  page,
+  setCount,
+  search = "",
+}: Props) {
+  // useAllResidents should be (page, q)
+  const { data, isLoading, isError } = useAllResidents(page, search);
 
-  const { data, isLoading, isError } = starWarsData;
+  // update pagination count when data changes (SWAPI page size = 10)
+  React.useEffect(() => {
+    if (data?.count != null) setCount(data.count); // items, not pages
+  }, [data?.count, setCount]);
 
-  if (isLoading) {
-    console.log("⏳ Loading planets...");
-    return <div>Loading planets...</div>;
-  }
+  if (isLoading) return <div>Loading characters…</div>;
+  if (isError) return <div>Error fetching characters</div>;
 
-  if (isError) {
-    console.error("❌ Error loading planets");
-    return <div>Error fetching planets</div>;
-  }
-  const characters = data?.results;
-  console.log("characters123", characters);
+  const characters = data?.results ?? [];
 
-  const mapPlanet = characters?.map((item) => {
-    return <CharacterCardComponent props={item} />;
-  });
-  return mapPlanet;
+  return (
+    <>
+      {characters.map((item: any) => (
+        <CharacterCardComponent key={item.url ?? item.name} props={item} />
+      ))}
+    </>
+  );
 }

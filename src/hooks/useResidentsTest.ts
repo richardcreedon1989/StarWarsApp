@@ -25,24 +25,30 @@ function normalizeInput(input) {
   return { key: s, id: s };
 }
 
+// single fetcher (by id/url)
 async function fetchResident(info) {
-  if (info === undefined || info === null) {
-    const { data } = await axios.get("https://swapi.dev/api/people/");
-    return data; // { count, next, previous, results: [...] }
-  }
-
-  if (info.url) {
+  if (info?.url) {
     const { data } = await axios.get(info.url);
     return data;
   }
-  if (info.id) {
+  if (info?.id) {
     const { data } = await axios.get(
       `https://swapi.dev/api/people/${info.id}/`
     );
     return data;
   }
-
   throw new Error("No resident identifier provided");
+}
+
+// list fetcher (paginated + search)
+async function fetchResidentsPage(page = 1, q = "") {
+  const params = new URLSearchParams();
+  params.set("page", String(page));
+  if (q.trim()) params.set("search", q.trim());
+
+  const { data } = await axios.get(`https://swapi.dev/api/people/?${params}`);
+  // { count, next, previous, results }
+  return data;
 }
 
 // --- single resident -------------------------------------------------------
@@ -74,13 +80,16 @@ export function useResidentsMany(idsOrUrls = [], enabled = true) {
   });
 }
 
-export function useAllResidents() {
+// --- paginated list (with search) -----------------------------------------
+
+export function useAllResidents(page = 1, q = "") {
   return useQuery({
-    queryKey: ["allResidents"],
-    queryFn: () => fetchResident(),
+    queryKey: ["allResidents", page, q.trim()], // cache per page+query
+    queryFn: () => fetchResidentsPage(page, q),
+    keepPreviousData: true,
     staleTime: 60_000,
   });
 }
 
 // Optional alias if you want old imports to keep working:
-// export { useResident as useResidents };
+// export { useAllResidents as useResidentsList };

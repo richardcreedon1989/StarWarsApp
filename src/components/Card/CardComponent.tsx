@@ -42,7 +42,6 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
 export default function CardComponent(props) {
   const [expanded, setExpanded] = React.useState(true); //when user clicks expand
 
-  console.log("propsHere123", props);
   const { title, subtitle, climate, expandedItems, clickableItems } = props;
 
   const handleExpandClick = () => {

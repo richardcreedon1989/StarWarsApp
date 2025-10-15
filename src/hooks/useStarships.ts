@@ -1,20 +1,20 @@
-// hooks/useResidents.js
+// hooks/useStarships.ts (or .js)
 import { useMemo } from "react";
 import { useQuery, useQueries } from "@tanstack/react-query";
 import axios from "axios";
 
 // --- helpers ---------------------------------------------------------------
 
-function isUrl(input) {
-  return /^https?:\/\//i.test(input);
+function isUrl(input: unknown) {
+  return typeof input === "string" && /^https?:\/\//i.test(input);
 }
 
-function getIdFromUrl(url) {
-  const m = url.match(/people\/(\d+)\/?$/);
+function getIdFromUrl(url: string) {
+  const m = url.match(/starships\/(\d+)\/?$/);
   return m ? m[1] : null;
 }
 
-function normalizeInput(input) {
+function normalizeInput(input: any) {
   if (input === null || input === undefined) return { key: "" };
   const s = String(input).trim();
   if (!s) return { key: "" };
@@ -25,29 +25,38 @@ function normalizeInput(input) {
   return { key: s, id: s };
 }
 
-async function fetchStarship(info) {
-  if (info === undefined || info === null) {
-    const { data } = await axios.get("https://swapi.dev/api/starships/");
-    return data; // { count, next, previous, results: [...] }
-  }
+// --- fetchers --------------------------------------------------------------
 
-  if (info.url) {
+async function fetchStarship(info: { url?: string; id?: string }) {
+  if (info?.url) {
     const { data } = await axios.get(info.url);
     return data;
   }
-  if (info.id) {
+  if (info?.id) {
     const { data } = await axios.get(
       `https://swapi.dev/api/starships/${info.id}/`
     );
     return data;
   }
-
-  throw new Error("No resident identifier provided");
+  throw new Error("No starship identifier provided");
 }
 
-// --- single resident -------------------------------------------------------
+async function fetchStarshipsPage(page = 1, q = "") {
+  const params = new URLSearchParams();
+  params.set("page", String(page));
+  if (q.trim()) params.set("search", q.trim());
 
-export function useStarship(starshipIdOrUrl) {
+  const { data } = await axios.get(
+    `https://swapi.dev/api/starships/?${params}`
+  );
+  // -> { count, next, previous, results }
+  return data;
+}
+
+// --- hooks -----------------------------------------------------------------
+
+// Single starship by id or URL
+export function useStarship(starshipIdOrUrl?: string) {
   const info = normalizeInput(starshipIdOrUrl);
   const enabled = info.key !== "";
 
@@ -59,12 +68,12 @@ export function useStarship(starshipIdOrUrl) {
   });
 }
 
-// --- many residents (array) -----------------------------------------------
-
-export function useStarshipsMany(idsOrUrls = [], enabled = true) {
+// Many by ids/urls (parallel)
+export function useStarshipsMany(
+  idsOrUrls: Array<string> = [],
+  enabled = true
+) {
   const inputs = useMemo(() => idsOrUrls.map(normalizeInput), [idsOrUrls]);
-  console.log("idsOrUrls", idsOrUrls);
-  console.log("inputs", inputs);
 
   return useQueries({
     queries: inputs.map((info) => ({
@@ -76,13 +85,12 @@ export function useStarshipsMany(idsOrUrls = [], enabled = true) {
   });
 }
 
-export function useAllStarships() {
+// Paginated list with search
+export function useAllStarships(page = 1, q = "") {
   return useQuery({
-    queryKey: ["allStarships"],
-    queryFn: () => fetchStarship(),
+    queryKey: ["allStarships", page, q.trim()], // cache per page+query
+    queryFn: () => fetchStarshipsPage(page, q),
+    keepPreviousData: true,
     staleTime: 60_000,
   });
 }
-
-// Optional alias if you want old imports to keep working:
-// export { useResident as useResidents };

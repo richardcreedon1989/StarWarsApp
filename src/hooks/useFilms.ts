@@ -78,8 +78,6 @@ export function useFilms(residentIdOrUrl) {
 // --- many residents (array) -----------------------------------------------
 
 export function useFilmsMany(idsOrUrls = [], enabled = true) {
-  console.log("idsOrUrls", idsOrUrls);
-  console.log("idsOrUrls123", idsOrUrls);
   const inputs = useMemo(() => idsOrUrls.map(normalizeInput), [idsOrUrls]);
 
   return useQueries({

@@ -7,7 +7,6 @@ import { useFilmsMany } from "../../hooks/useFilms";
 import { useResidentsMany } from "../../hooks/useResidentsTest";
 export default function PlanetDetails({ url }: { url: string }) {
   const { data, isLoading, isError } = usePlanets(url);
-  console.log("planetDataHere;", data);
   const homeworld = data?.url;
   const films = data?.films;
   const getPlanetFilms = useFilmsMany(films ?? []);

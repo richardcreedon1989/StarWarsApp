@@ -28,7 +28,6 @@ export default function App() {
     setOpen(true);
   }
 
-  console.log("residentUrl", residentUrl);
   return (
     <div className="App">
       <EntityDialogProvider>
