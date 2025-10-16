@@ -38,6 +38,7 @@ export default function NavigationTabs() {
 
   useEffect(() => {
     setPage(1);
+    setInput("");
   }, [value]);
 
   useEffect(() => {
