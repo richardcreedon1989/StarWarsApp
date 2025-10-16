@@ -13,7 +13,7 @@ export default function PersonDetails({ url }: { url: string }) {
     .filter(Boolean)
     .join(", ");
 
-  const homeworld = data.homeworld;
+  const homeworld = data?.homeworld;
   const getHomeworld = usePlanets(homeworld)?.data?.name;
 
   if (isLoading) return <Typography>Loading…</Typography>;

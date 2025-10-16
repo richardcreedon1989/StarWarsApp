@@ -38,7 +38,7 @@ export default function PlanetTableRow({ planet }: Props) {
 
   return (
     <>
-      <TableRow hover>
+      <TableRow data-testid="planet-row" hover>
         <TableCell width={48}>
           <IconButton
             size="small"
