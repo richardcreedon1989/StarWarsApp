@@ -1,26 +1,23 @@
 import Typography from "@mui/material/Typography";
-import { useResident } from "../../hooks/useResidentsTest";
-import { useResidentsFilms } from "../../hooks/useResidentsFilms";
-import { useStarshipsMany } from "../../hooks/useStarships";
 import { usePlanets } from "../../hooks/usePlanets";
 import { useFilmsMany } from "../../hooks/useFilms";
-import { useResidentsMany } from "../../hooks/useResidentsTest";
+import { useResidentsMany } from "../../hooks/useResidents";
+
 export default function PlanetDetails({ url }: { url: string }) {
   const { data, isLoading, isError } = usePlanets(url);
-  const homeworld = data?.url;
   const films = data?.films;
   const getPlanetFilms = useFilmsMany(films ?? []);
 
-  const film123 = getPlanetFilms
-    .map((q) => q.data?.title)
+  const filmsToDisplay = getPlanetFilms
+    .map((query) => query.data?.title)
     .filter(Boolean)
     .join(", ");
 
   const residents = data?.residents;
   const getResidentsNames = useResidentsMany(residents);
 
-  const residents123 = getResidentsNames
-    .map((q) => q.data?.name)
+  const residentsToDisplay = getResidentsNames
+    .map((query) => query.data?.name)
     .filter(Boolean)
     .join(", ");
 
@@ -30,12 +27,21 @@ export default function PlanetDetails({ url }: { url: string }) {
 
   return (
     <>
-      <Typography>Name: {data.name}</Typography>
-      <Typography>Population: {data.population}</Typography>
-      <Typography>Climate: {data.climate}</Typography>
-
-      <Typography>Films: {film123 || "—"}</Typography>
-      <Typography>Residents: {residents123 || "—"}</Typography>
+      <Typography>
+        <strong>Name: </strong> {data.name}
+      </Typography>
+      <Typography>
+        <strong>Population: </strong> {data.population}
+      </Typography>
+      <Typography>
+        <strong>Climate: </strong> {data.climate}
+      </Typography>
+      <Typography>
+        <strong>Films: </strong> {filmsToDisplay || "None"}
+      </Typography>
+      <Typography>
+        <strong>Residents: </strong> {residentsToDisplay || "None"}
+      </Typography>
     </>
   );
 }

@@ -1,7 +1,6 @@
 import DialogShell from "./DialogShell";
 import { useEntityDialog } from "../../context/EntityDialogContext";
 import PersonDetails from "../views/PersonDetails";
-// import StarshipDetails from "../views/StarshipDetails";
 import PlanetDetails from "../views/PlanetDetails";
 import StarshipDetails from "../views/StarshipDetails";
 export default function EntityDialogHost() {
