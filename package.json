@@ -22,11 +22,14 @@
     "react-dom": "18.2.0"
   },
   "devDependencies": {
+    "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
+    "@types/jest": "^30.0.0",
     "@types/react": "18.2.38",
     "@types/react-dom": "18.2.15",
     "@vitejs/plugin-react": "^4.2.1",
+    "jsdom": "^27.0.0",
     "typescript": "4.4.4",
     "vite": "^5.0.11",
     "vitest": "^3.2.4"
@@ -34,7 +37,11 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:ui": "vitest --ui",
+    "test:cov": "vitest --coverage"
   },
   "browserslist": [
     ">0.2%",
