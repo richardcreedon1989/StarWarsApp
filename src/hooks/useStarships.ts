@@ -1,88 +1,53 @@
-// hooks/useResidents.js
 import { useMemo } from "react";
 import { useQuery, useQueries } from "@tanstack/react-query";
 import axios from "axios";
 
-// --- helpers ---------------------------------------------------------------
+const fetchByUrl = async (url: string) => {
+  const { data } = await axios.get(url);
+  return data;
+};
 
-function isUrl(input) {
-  return /^https?:\/\//i.test(input);
-}
+const fetchStarshipsPage = async (page = 1, q = "") => {
+  const params = new URLSearchParams();
+  params.set("page", String(page));
+  if (q && q.trim()) params.set("search", q.trim());
 
-function getIdFromUrl(url) {
-  const m = url.match(/people\/(\d+)\/?$/);
-  return m ? m[1] : null;
-}
+  const { data } = await axios.get(
+    `https://swapi.dev/api/starships/?${params}`
+  );
+  return data;
+};
 
-function normalizeInput(input) {
-  if (input === null || input === undefined) return { key: "" };
-  const s = String(input).trim();
-  if (!s) return { key: "" };
-
-  if (isUrl(s)) {
-    return { key: s, url: s, id: getIdFromUrl(s) || undefined };
-  }
-  return { key: s, id: s };
-}
-
-async function fetchStarship(info) {
-  if (info === undefined || info === null) {
-    const { data } = await axios.get("https://swapi.dev/api/starships/");
-    return data; // { count, next, previous, results: [...] }
-  }
-
-  if (info.url) {
-    const { data } = await axios.get(info.url);
-    return data;
-  }
-  if (info.id) {
-    const { data } = await axios.get(
-      `https://swapi.dev/api/starships/${info.id}/`
-    );
-    return data;
-  }
-
-  throw new Error("No resident identifier provided");
-}
-
-// --- single resident -------------------------------------------------------
-
-export function useStarship(starshipIdOrUrl) {
-  const info = normalizeInput(starshipIdOrUrl);
-  const enabled = info.key !== "";
-
+export function useStarship(starshipUrl?: string | null) {
+  const enabled = Boolean(starshipUrl);
   return useQuery({
-    queryKey: ["starship", info.key],
-    queryFn: () => fetchStarship(info),
+    queryKey: ["starship", starshipUrl],
+    queryFn: () => fetchByUrl(starshipUrl as string),
     enabled,
     staleTime: 60_000,
   });
 }
 
-// --- many residents (array) -----------------------------------------------
-
-export function useStarshipsMany(idsOrUrls = [], enabled = true) {
-  const inputs = useMemo(() => idsOrUrls.map(normalizeInput), [idsOrUrls]);
-  console.log("idsOrUrls", idsOrUrls);
-  console.log("inputs", inputs);
+export function useStarshipsMany(urls: string[] = [], enabled = true) {
+  const safeUrls = useMemo(
+    () => (Array.isArray(urls) ? urls.filter(Boolean) : []),
+    [urls]
+  );
 
   return useQueries({
-    queries: inputs.map((info) => ({
-      queryKey: ["starship", info.key],
-      queryFn: () => fetchStarship(info),
-      enabled: enabled && info.key !== "",
+    queries: safeUrls.map((url) => ({
+      queryKey: ["starship", url],
+      queryFn: () => fetchByUrl(url),
+      enabled: enabled && !!url,
       staleTime: 60_000,
     })),
   });
 }
 
-export function useAllStarships() {
+export function useAllStarships(page = 1, q = "") {
   return useQuery({
-    queryKey: ["allStarships"],
-    queryFn: () => fetchStarship(),
+    queryKey: ["allStarships", page, q.trim()],
+    queryFn: () => fetchStarshipsPage(page, q),
     staleTime: 60_000,
   });
 }
-
-// Optional alias if you want old imports to keep working:
-// export { useResident as useResidents };

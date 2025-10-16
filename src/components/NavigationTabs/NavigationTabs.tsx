@@ -1,20 +1,20 @@
-import * as React from "react";
+import { useEffect, useState, SyntheticEvent, ReactNode } from "react";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
-import PlanetCardContainer from "../Planet/PlanetCardContainer";
-import CharacterCardContainer from "../Character/CharactersCardContainer";
-import StarshipsContainer from "../Starships/StarshipsContainer";
-// import Table from "../Table";
+import TextField from "@mui/material/TextField";
+import Pagination from "../Pagination/Pagination";
+import PlanetTableContainer from "../Planet/PlanetTableContainer";
+import CharacterTableContainer from "../Character/CharacterTableContainer";
+import StarshipsTableContainer from "../Starships/StarshipsTableContainer";
 interface TabPanelProps {
-  children?: React.ReactNode;
+  children?: ReactNode;
   index: number;
   value: number;
 }
 
 function CustomTabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
-
   return (
     <div
       role="tabpanel"
@@ -28,41 +28,73 @@ function CustomTabPanel(props: TabPanelProps) {
   );
 }
 
-function a11yProps(index: number) {
-  return {
-    id: `simple-tab-${index}`,
-    "aria-controls": `simple-tabpanel-${index}`,
-  };
-}
-
 export default function NavigationTabs() {
-  const [value, setValue] = React.useState(0);
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+  const [value, setValue] = useState(0);
+  const [page, setPage] = useState(1);
+  const [count, setCount] = useState(0);
+
+  const [input, setInput] = useState("");
+  const [query, setQuery] = useState("");
+
+  useEffect(() => {
+    setPage(1);
+  }, [value]);
+
+  useEffect(() => {
+    const id = setTimeout(() => {
+      setPage(1);
+      setQuery(input);
+    }, 300);
+    return () => clearTimeout(id);
+  }, [input]);
+
+  const handleChange = (_event: SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
+
+  const currentLabel =
+    value === 0 ? "Planets" : value === 1 ? "Characters" : "Starships";
 
   return (
     <Box sx={{ width: "100%" }}>
       <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-        <Tabs
-          value={value}
-          onChange={handleChange}
-          aria-label="basic tabs example"
-        >
-          <Tab label="Planets" {...a11yProps(0)} />
-          <Tab label="Characters" {...a11yProps(1)} />
-          <Tab label="Starships" {...a11yProps(2)} />
+        <Tabs value={value} onChange={handleChange} aria-label="basic tabs">
+          <Tab label="Planets" />
+          <Tab label="Characters" />
+          <Tab label="Starships" />
         </Tabs>
       </Box>
+
+      {value !== 2 && (
+        <Box sx={{ p: 3 }}>
+          <TextField
+            fullWidth
+            size="small"
+            label={`Search ${currentLabel}`}
+            placeholder={`Search ${currentLabel}…`}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+          />
+        </Box>
+      )}
+
       <CustomTabPanel value={value} index={0}>
-        <PlanetCardContainer />
+        <PlanetTableContainer page={page} setCount={setCount} search={query} />
       </CustomTabPanel>
+
       <CustomTabPanel value={value} index={1}>
-        <CharacterCardContainer />
+        <CharacterTableContainer
+          page={page}
+          setCount={setCount}
+          search={query}
+        />
       </CustomTabPanel>
+
       <CustomTabPanel value={value} index={2}>
-        <StarshipsContainer />
+        <StarshipsTableContainer page={page} setCount={setCount} />
       </CustomTabPanel>
+
+      <Pagination page={page} setPage={setPage} count={count} />
     </Box>
   );
 }
