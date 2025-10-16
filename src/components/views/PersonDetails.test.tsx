@@ -1,9 +1,12 @@
 import { render, screen } from "@testing-library/react";
-import { vi, describe, it, beforeEach, expect } from "vitest"; // import the globals explicitly
+import { vi, describe, it, beforeEach, expect } from "vitest";
 import PersonDetails from "./PersonDetails";
 import { Mock } from "vitest";
+import { useResident } from "../../hooks/useResidents";
+import { useResidentsFilms } from "../../hooks/useResidentsFilms";
+import { useStarshipsMany } from "../../hooks/useStarships";
+import { usePlanets } from "../../hooks/usePlanets";
 
-// ---- mock the hooks used by the component (Vitest style) ----
 vi.mock("../../hooks/useResidents", () => ({
   useResident: vi.fn(),
 }));
@@ -16,12 +19,6 @@ vi.mock("../../hooks/useStarships", () => ({
 vi.mock("../../hooks/usePlanets", () => ({
   usePlanets: vi.fn(),
 }));
-
-// pull typed references to mocks
-import { useResident } from "../../hooks/useResidents";
-import { useResidentsFilms } from "../../hooks/useResidentsFilms";
-import { useStarshipsMany } from "../../hooks/useStarships";
-import { usePlanets } from "../../hooks/usePlanets";
 
 const mockUseResident = useResident as Mock;
 const mockUseResidentsFilms = useResidentsFilms as Mock;

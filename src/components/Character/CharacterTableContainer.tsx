@@ -12,7 +12,7 @@ import {
 import { useAllResidents } from "../../hooks/useResidents";
 import CharacterTableRow from "./CharacterTableRow";
 import { sort } from "fast-sort";
-
+import { Person } from "../../types/person.types";
 type Dir = "asc" | "desc";
 
 type Props = {
@@ -38,13 +38,17 @@ export default function CharacterTableContainer({
     setOrder((o) => (o === "asc" ? "desc" : "asc"));
   };
 
-  const rows = useMemo(() => {
-    const items = data?.results ?? [];
+  const items: Person[] = useMemo(
+    () => (data?.results ?? []) as Person[],
+    [data?.results]
+  );
 
+  const sorted = useMemo(() => {
+    const s = sort<Person>(items);
     return order === "asc"
-      ? sort(items).asc((p: any) => String(p.name ?? "").toLowerCase())
-      : sort(items).desc((p: any) => String(p.name ?? "").toLowerCase());
-  }, [data?.results, order]);
+      ? s.asc((p) => (p.name ?? "").toLowerCase())
+      : s.desc((p) => (p.name ?? "").toLowerCase());
+  }, [items, order]);
 
   if (isLoading) return <div>Loading characters…</div>;
   if (isError) return <div>Error loading characters</div>;
@@ -65,7 +69,7 @@ export default function CharacterTableContainer({
         </TableHead>
 
         <TableBody>
-          {rows.map((person: any) => (
+          {sorted.map((person: Person) => (
             <CharacterTableRow
               key={person.url ?? person.name}
               person={person}

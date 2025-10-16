@@ -17,9 +17,10 @@ export function useResidentsFilms(residentUrl: string, enabled = true) {
     })),
   });
 
-  const titles = filmsQuery.map((q) => q.data?.title).filter(Boolean);
-  const isLoading = enabled && (!person || filmsQuery.some((q) => q.isLoading));
-  const isError = filmsQuery.some((q) => q.isError);
+  const titles = filmsQuery.map((query) => query.data?.title).filter(Boolean);
+  const isLoading =
+    enabled && (!person || filmsQuery.some((query) => query.isLoading));
+  const isError = filmsQuery.some((query) => query.isError);
 
   return { titles, isLoading, isError };
 }

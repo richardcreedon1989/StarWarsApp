@@ -20,19 +20,19 @@ export function usePlanets(
   page: number = 1,
   query: string = ""
 ) {
-  const planetQuery = useQuery({
+  const singlePlanetQuery = useQuery({
     queryKey: ["planet", homeworld],
-    enabled: !!homeworld,
-    queryFn: () => fetchPlanetByUrl(homeworld as string),
+    queryFn: () => fetchPlanetByUrl(homeworld!),
+    enabled: typeof homeworld === "string" && homeworld.length > 0,
     staleTime: 60_000,
   });
 
-  const listQuery = useQuery({
+  const multiplePlanetsQuery = useQuery({
     queryKey: ["planets", page, query.trim()],
     enabled: !homeworld,
     queryFn: () => fetchPlanets(page, query),
     staleTime: 60_000,
   });
 
-  return homeworld ? planetQuery : listQuery;
+  return homeworld ? singlePlanetQuery : multiplePlanetsQuery;
 }

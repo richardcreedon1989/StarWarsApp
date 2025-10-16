@@ -5,7 +5,7 @@ import { useResident } from "./useResidents";
 const fetchFilm = (url: string) => axios.get(url).then((r) => r.data);
 
 export function usePlanetsFilms(residentUrl: string, enabled = true) {
-  const { data: person } = useResident(enabled ? residentUrl : null);
+  const { data: person } = useResident(residentUrl);
 
   const filmUrls = person?.films ?? [];
   const filmsQuery = useQueries({
