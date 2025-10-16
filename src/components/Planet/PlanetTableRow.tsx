@@ -32,7 +32,7 @@ export default function PlanetTableRow({ planet }: Props) {
       filmsQuery
         ?.map((queryResult: any) => queryResult?.data?.title)
         .filter(Boolean)
-        .join(", ") || "—",
+        .join(", ") || "None",
     [filmsQuery]
   );
 
@@ -82,7 +82,7 @@ export default function PlanetTableRow({ planet }: Props) {
                 <div>
                   <strong>Residents:</strong>{" "}
                   {residents.length === 0
-                    ? "—"
+                    ? "None"
                     : residentsQuery.map((queryResult: any, i: number) => {
                         const name = queryResult?.data?.name;
                         const url = queryResult?.data?.url;

@@ -29,13 +29,8 @@ export function useStarship(starshipUrl?: string | null) {
 }
 
 export function useStarshipsMany(urls: string[] = [], enabled = true) {
-  const safeUrls = useMemo(
-    () => (Array.isArray(urls) ? urls.filter(Boolean) : []),
-    [urls]
-  );
-
   return useQueries({
-    queries: safeUrls.map((url) => ({
+    queries: urls.map((url) => ({
       queryKey: ["starship", url],
       queryFn: () => fetchByUrl(url),
       enabled: enabled && !!url,
@@ -44,10 +39,10 @@ export function useStarshipsMany(urls: string[] = [], enabled = true) {
   });
 }
 
-export function useAllStarships(page = 1, q = "") {
+export function useAllStarships(page = 1, query = "") {
   return useQuery({
-    queryKey: ["allStarships", page, q.trim()],
-    queryFn: () => fetchStarshipsPage(page, q),
+    queryKey: ["allStarships", page, query.trim()],
+    queryFn: () => fetchStarshipsPage(page, query),
     staleTime: 60_000,
   });
 }

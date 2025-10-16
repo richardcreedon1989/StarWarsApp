@@ -3,11 +3,53 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import PlanetTableContainer from "./PlanetTableContainer";
 import { usePlanets } from "../../hooks/usePlanets";
 import type { UseQueryResult } from "@tanstack/react-query";
-import type { QueryObserverResult } from "@tanstack/react-query";
 import { EntityDialogProvider } from "../../context/EntityDialogContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-// Mock the hook
+type PlanetRow = { name: string; population: string; url: string };
+type PlanetsListApi = { count: number; results: PlanetRow[] };
+
+function fullResult<T>(
+  patch: Partial<UseQueryResult<T, Error>>
+): UseQueryResult<T, Error> {
+  return {
+    data: undefined as unknown as T,
+    error: null,
+    isLoading: false,
+    isError: false,
+    isSuccess: false,
+    isFetching: false,
+    status: "success",
+    fetchStatus: "idle",
+    refetch: vi.fn() as any,
+    ...patch,
+  } as unknown as UseQueryResult<T, Error>;
+}
+
+export const loading = <T,>() =>
+  fullResult<T>({
+    isLoading: true,
+    status: "pending",
+    fetchStatus: "fetching",
+  });
+
+export const errored = <T,>(msg = "Failed") =>
+  fullResult<T>({
+    isError: true,
+    error: new Error(msg),
+    status: "error",
+    fetchStatus: "idle",
+  });
+
+export const success = <T,>(data: T) =>
+  fullResult<T>({
+    data,
+    isSuccess: true,
+    isFetching: false,
+    status: "success",
+    fetchStatus: "idle",
+  });
+
 vi.mock("../../hooks/usePlanets", () => ({
   usePlanets: vi.fn(),
 }));
@@ -16,11 +58,7 @@ const mockUsePlanets = vi.mocked(usePlanets);
 
 function renderWithProviders(ui: React.ReactElement) {
   const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: false,
-      },
-    },
+    defaultOptions: { queries: { retry: false } },
   });
 
   return render(
@@ -30,81 +68,11 @@ function renderWithProviders(ui: React.ReactElement) {
   );
 }
 
-export function createLoadingResult<T>(): QueryObserverResult<T, Error> {
-  return {
-    data: undefined,
-    error: null,
-    isLoading: true,
-    isError: false,
-    isSuccess: false,
-    isFetching: true,
-    refetch: vi.fn(),
-    failureCount: 0,
-    isRefetching: false,
-    status: "pending",
-    fetchStatus: "fetching",
-    isPlaceholderData: false,
-    isPaused: false,
-  } as unknown as QueryObserverResult<T, Error>;
-}
-
-export function createErrorResult<T>(
-  message = "Failed"
-): QueryObserverResult<T, Error> {
-  return {
-    data: undefined,
-    error: new Error(message),
-    isLoading: false,
-    isError: true,
-    isSuccess: false,
-    isFetching: false,
-    refetch: vi.fn(),
-    failureCount: 1,
-    isRefetching: false,
-    status: "error",
-    fetchStatus: "idle",
-    isPlaceholderData: false,
-    isPaused: false,
-  } as unknown as QueryObserverResult<T, Error>;
-}
-
-export function createSuccessResult<T>(data: T): QueryObserverResult<T, Error> {
-  return {
-    data,
-    error: null,
-    isLoading: false,
-    isError: false,
-    isSuccess: true,
-    isFetching: false,
-    refetch: vi.fn(),
-    failureCount: 0,
-    isRefetching: false,
-    status: "success",
-    fetchStatus: "idle",
-    isPlaceholderData: false,
-    isPaused: false,
-  } as unknown as QueryObserverResult<T, Error>;
-}
-
-// vi.mock("./PlanetTableRow", () => ({
-//   default: ({ planet }: any) => (
-//     <tr data-testid="planet-row">
-//       <td />
-//       <td>{planet.name}</td>
-//       <td>{planet.population}</td>
-//     </tr>
-//   ),
-// }));
-
 describe("<PlanetTableContainer />", () => {
   const setCountMock = vi.fn();
-  const defaultProps = {
-    page: 1,
-    search: "",
-    setCount: setCountMock,
-  };
+  const defaultProps = { page: 1, search: "", setCount: setCountMock };
 
-  const fakeData = {
+  const fakeData: PlanetsListApi = {
     count: 2,
     results: [
       { name: "Tatooine", population: "200000", url: "1" },
@@ -114,24 +82,25 @@ describe("<PlanetTableContainer />", () => {
 
   beforeEach(() => {
     vi.resetAllMocks();
+    setCountMock.mockReset();
   });
 
   it("shows loading state", () => {
-    mockUsePlanets.mockReturnValue(createLoadingResult());
+    mockUsePlanets.mockReturnValue(loading<PlanetsListApi>());
 
     renderWithProviders(<PlanetTableContainer {...defaultProps} />);
     expect(screen.getByText(/loading planets/i)).toBeInTheDocument();
   });
 
   it("shows error state", () => {
-    mockUsePlanets.mockReturnValue(createErrorResult());
+    mockUsePlanets.mockReturnValue(errored<PlanetsListApi>());
 
     renderWithProviders(<PlanetTableContainer {...defaultProps} />);
     expect(screen.getByText(/error loading planets/i)).toBeInTheDocument();
   });
 
   it("renders planet rows sorted ascending by default", () => {
-    mockUsePlanets.mockReturnValue(createSuccessResult(fakeData));
+    mockUsePlanets.mockReturnValue(success<PlanetsListApi>(fakeData));
 
     renderWithProviders(<PlanetTableContainer {...defaultProps} />);
     const rows = screen.getAllByTestId("planet-row");
@@ -141,14 +110,14 @@ describe("<PlanetTableContainer />", () => {
   });
 
   it("calls setCount with correct count", () => {
-    mockUsePlanets.mockReturnValue(createSuccessResult(fakeData));
+    mockUsePlanets.mockReturnValue(success<PlanetsListApi>(fakeData));
 
     renderWithProviders(<PlanetTableContainer {...defaultProps} />);
     expect(setCountMock).toHaveBeenCalledWith(2);
   });
 
   it("toggles sort order when sort header is clicked", () => {
-    mockUsePlanets.mockReturnValue(createSuccessResult(fakeData));
+    mockUsePlanets.mockReturnValue(success<PlanetsListApi>(fakeData));
 
     renderWithProviders(<PlanetTableContainer {...defaultProps} />);
     let rows = screen.getAllByTestId("planet-row");

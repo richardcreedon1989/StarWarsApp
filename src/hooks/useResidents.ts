@@ -7,10 +7,10 @@ const fetchByUrl = async (url: string) => {
   return data;
 };
 
-const fetchResidentsPage = async (page = 1, q = "") => {
+const fetchResidentsPage = async (page = 1, query = "") => {
   const params = new URLSearchParams();
   params.set("page", String(page));
-  if (q && q.trim()) params.set("search", q.trim());
+  if (query && query.trim()) params.set("search", query.trim());
   const { data } = await axios.get(`https://swapi.dev/api/people/?${params}`);
   return data;
 };
@@ -27,13 +27,8 @@ export function useResident(residentUrl: string) {
 }
 
 export function useResidentsMany(urls = [], enabled = true) {
-  const safeUrls = useMemo(
-    () => (Array.isArray(urls) ? urls.filter(Boolean) : []),
-    [urls]
-  );
-
   return useQueries({
-    queries: safeUrls.map((url) => ({
+    queries: urls.map((url) => ({
       queryKey: ["resident", url],
       queryFn: () => fetchByUrl(url),
       enabled: enabled && !!url,
@@ -42,10 +37,10 @@ export function useResidentsMany(urls = [], enabled = true) {
   });
 }
 
-export function useAllResidents(page = 1, q = "") {
+export function useAllResidents(page = 1, query = "") {
   return useQuery({
-    queryKey: ["allResidents", page, q.trim()],
-    queryFn: () => fetchResidentsPage(page, q),
+    queryKey: ["allResidents", page, query.trim()],
+    queryFn: () => fetchResidentsPage(page, query),
     staleTime: 60_000,
   });
 }
