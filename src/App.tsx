@@ -1,7 +1,7 @@
 import "./styles.css";
 import NavigationTabs from "./components/NavigationTabs";
 import { EntityDialogProvider } from "./context/EntityDialogContext";
-import EntityDialogHost from "./components/Dialog/EntityDialogHost";
+import EntityDialogHost from "./components/Dialogs/EntityDialogHost";
 
 export default function App() {
   return (
